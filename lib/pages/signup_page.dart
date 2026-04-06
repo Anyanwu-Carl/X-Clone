@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -26,7 +27,8 @@ class _SignUpPageState extends State<SignUpPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // X logo
-              Image.asset("assets/images/x-logo.avif", height: 60),
+              // Image.asset("assets/images/x-logo.avif", height: 60),
+              FaIcon(FontAwesomeIcons.xTwitter, color: Colors.white, size: 60),
 
               const SizedBox(height: 30),
 
