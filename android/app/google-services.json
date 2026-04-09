@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "249274100722",
+    "project_id": "x-clone-1aa25",
+    "storage_bucket": "x-clone-1aa25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:249274100722:android:7a3df6bbf5de9f992b196b",
+        "android_client_info": {
+          "package_name": "com.example.tute_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnihapl-qjlXvgf1mdgwyI6dlNZJoKHW8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
