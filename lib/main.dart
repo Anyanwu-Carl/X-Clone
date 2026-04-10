@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:tute_app/firebase_options.dart';
+import 'package:tute_app/pages/home_page.dart';
 import 'package:tute_app/pages/signin_page.dart';
 
 void main() async {
@@ -17,7 +19,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "Flutter Demo",
       debugShowCheckedModeBanner: false,
-      routes: {"/": (context) => const SignInPage()},
+      home: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return HomePage();
+          }
+          return SignInPage();
+        },
+      ),
     );
   }
 }

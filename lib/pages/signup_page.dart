@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tute_app/models/user.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -9,12 +12,24 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  // Firebase auth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Firebase Firestore
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final GlobalKey<FormState> _signUpKey = GlobalKey();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+
+  // Email and password controllers
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  // Create Regex email format
   final RegExp emailValid = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
+
+  // Build UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,12 +66,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextButton(
-                  onPressed: () {
-                    if (_signUpKey.currentState!.validate()) {
-                      debugPrint("Email: ${_emailController}");
-                      debugPrint("Password: ${_passwordController}");
-                    }
-                  },
+                  onPressed: () {},
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -88,12 +98,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextButton(
-                  onPressed: () {
-                    if (_signUpKey.currentState!.validate()) {
-                      debugPrint("Email: ${_emailController}");
-                      debugPrint("Password: ${_passwordController}");
-                    }
-                  },
+                  onPressed: () {},
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -124,7 +129,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextFormField(
-                  controller: _emailController,
+                  style: TextStyle(color: Colors.white),
+                  controller: emailController,
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     hintText: "Enter an email",
@@ -156,7 +162,8 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextFormField(
-                  controller: _passwordController,
+                  style: TextStyle(color: Colors.white),
+                  controller: passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
                     hintText: "Enter a password",
@@ -187,10 +194,23 @@ class _SignUpPageState extends State<SignUpPage> {
                   borderRadius: BorderRadius.circular(30),
                 ),
                 child: TextButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (_signUpKey.currentState!.validate()) {
-                      debugPrint("Email: ${_emailController}");
-                      debugPrint("Password: ${_passwordController}");
+                      await _auth.createUserWithEmailAndPassword(
+                        email: emailController.text,
+                        password: passwordController.text,
+                      );
+
+                      // Firebase Firestore
+                      await _firestore
+                          .collection("users")
+                          .add(
+                            FirebaseUser(email: emailController.text).toMap(),
+                          );
+                      // SAFETY CHECK
+                      if (!mounted) return;
+                      // POP SIGN-UP PAGE
+                      Navigator.pop(context);
                     }
                   },
                   child: Text(

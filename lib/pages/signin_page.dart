@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tute_app/pages/signup_page.dart';
@@ -10,13 +12,21 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> {
+  // Firebase auth
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   final GlobalKey<FormState> _signInKey = GlobalKey();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+
+  // Email and password controller
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  // Regex format for email
   final RegExp emailValid = RegExp(
     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
   );
 
+  // Build UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,12 +68,7 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextButton(
-                    onPressed: () {
-                      if (_signInKey.currentState!.validate()) {
-                        debugPrint("Email: ${_emailController}");
-                        debugPrint("Password: ${_passwordController}");
-                      }
-                    },
+                    onPressed: () {},
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -95,12 +100,7 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextButton(
-                    onPressed: () {
-                      if (_signInKey.currentState!.validate()) {
-                        debugPrint("Email: ${_emailController}");
-                        debugPrint("Password: ${_passwordController}");
-                      }
-                    },
+                    onPressed: () {},
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -131,6 +131,7 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextFormField(
+                    style: TextStyle(color: Colors.white),
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
@@ -163,6 +164,7 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextFormField(
+                    style: TextStyle(color: Colors.white),
                     controller: _passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
@@ -194,10 +196,18 @@ class _SignInPageState extends State<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (_signInKey.currentState!.validate()) {
-                        debugPrint("Email: ${_emailController}");
-                        debugPrint("Password: ${_passwordController}");
+                        try {
+                          await _auth.signInWithEmailAndPassword(
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                          );
+                        } catch (e) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(e.toString())));
+                        }
                       }
                     },
                     child: Text(
