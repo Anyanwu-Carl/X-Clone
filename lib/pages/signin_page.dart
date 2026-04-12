@@ -1,25 +1,26 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tute_app/pages/signup_page.dart';
+import 'package:tute_app/provider/user_provider.dart';
 
-class SignInPage extends StatefulWidget {
+class SignInPage extends ConsumerStatefulWidget {
   const SignInPage({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  ConsumerState<SignInPage> createState() => _SignInPageState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageState extends ConsumerState<SignInPage> {
   // Firebase auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   final GlobalKey<FormState> _signInKey = GlobalKey();
 
   // Email and password controller
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   // Regex format for email
   final RegExp emailValid = RegExp(
@@ -132,7 +133,7 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   child: TextFormField(
                     style: TextStyle(color: Colors.white),
-                    controller: _emailController,
+                    controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: "Enter an email",
@@ -165,7 +166,7 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                   child: TextFormField(
                     style: TextStyle(color: Colors.white),
-                    controller: _passwordController,
+                    controller: passwordController,
                     obscureText: true,
                     decoration: InputDecoration(
                       hintText: "Enter a password",
@@ -200,10 +201,17 @@ class _SignInPageState extends State<SignInPage> {
                       if (_signInKey.currentState!.validate()) {
                         try {
                           await _auth.signInWithEmailAndPassword(
-                            email: _emailController.text,
-                            password: _passwordController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
                           );
-                        } catch (e) {
+
+                          // Sigin state notifier
+                          ref
+                              .read(userProvider.notifier)
+                              .login(emailController.text);
+                        }
+                        // Error
+                        catch (e) {
                           ScaffoldMessenger.of(
                             context,
                           ).showSnackBar(SnackBar(content: Text(e.toString())));
@@ -233,8 +241,8 @@ class _SignInPageState extends State<SignInPage> {
                   child: TextButton(
                     onPressed: () {
                       if (_signInKey.currentState!.validate()) {
-                        debugPrint("Email: ${_emailController}");
-                        debugPrint("Password: ${_passwordController}");
+                        debugPrint("Email: ${emailController.text}");
+                        debugPrint("Password: ${passwordController.text}");
                       }
                     },
                     child: Text(

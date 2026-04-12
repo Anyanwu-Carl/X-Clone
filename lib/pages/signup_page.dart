@@ -1,22 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:tute_app/models/user.dart';
+import 'package:tute_app/provider/user_provider.dart';
 
-class SignUpPage extends StatefulWidget {
+class SignUpPage extends ConsumerStatefulWidget {
   const SignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  ConsumerState<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _SignUpPageState extends ConsumerState<SignUpPage> {
   // Firebase auth
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Firebase Firestore
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final GlobalKey<FormState> _signUpKey = GlobalKey();
 
@@ -201,12 +200,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         password: passwordController.text,
                       );
 
-                      // Firebase Firestore
-                      await _firestore
-                          .collection("users")
-                          .add(
-                            FirebaseUser(email: emailController.text).toMap(),
-                          );
+                      // Signup state notifier
+                      await ref
+                          .read(userProvider.notifier)
+                          .signUp(emailController.text);
+
                       // SAFETY CHECK
                       if (!mounted) return;
                       // POP SIGN-UP PAGE
