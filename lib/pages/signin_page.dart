@@ -206,7 +206,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                           );
 
                           // Sigin state notifier
-                          ref
+                          await ref
                               .read(userProvider.notifier)
                               .login(emailController.text);
                         }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:tute_app/models/user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final userProvider = StateNotifierProvider<UserNotifier, LocalUser>((ref) {
   return UserNotifier();

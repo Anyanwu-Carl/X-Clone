@@ -26,9 +26,9 @@ class MyApp extends ConsumerWidget {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             ref.read(userProvider.notifier).login(snapshot.data!.email!);
-            return HomePage();
+            return const HomePage();
           }
-          return SignInPage();
+          return const SignInPage();
         },
       ),
     );
