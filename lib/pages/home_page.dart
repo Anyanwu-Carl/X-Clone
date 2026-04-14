@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tute_app/pages/settings_page.dart';
 import 'package:tute_app/provider/user_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -30,15 +31,6 @@ class HomePage extends ConsumerWidget {
             );
           },
         ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut();
-              ref.read(userProvider.notifier).logOut();
-            },
-            child: Text("Sign Out"),
-          ),
-        ],
       ),
       body: Column(
         children: [Text(currentUser.user.email), Text(currentUser.user.name)],
@@ -217,24 +209,63 @@ class HomePage extends ConsumerWidget {
             Divider(),
 
             // Settings and support
-            Row(
-              children: [
-                Text(
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+
+                // Navigate to settings page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SettingsPage()),
+                );
+              },
+              child: ListTile(
+                title: Text(
                   "Settings & Support",
                   style: TextStyle(
-                    color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
-
-                const Spacer(),
-
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.keyboard_arrow_down, color: Colors.white),
+                trailing: Icon(
+                  Icons.keyboard_arrow_right,
+                  color: Colors.white,
+                  size: 28,
                 ),
-              ],
+              ),
+            ),
+            const Spacer(),
+
+            // Sign-out
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      // Sign-out
+                      FirebaseAuth.instance.signOut();
+                      ref.read(userProvider.notifier).logOut();
+                    },
+                    child: ListTile(
+                      title: Text(
+                        "Sign out",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                        size: 28,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

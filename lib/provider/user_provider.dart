@@ -22,11 +22,11 @@ class UserNotifier extends StateNotifier<LocalUser> {
   UserNotifier()
     : super(
         LocalUser(
-          id: "error",
+          id: "",
           user: FirebaseUser(
-            email: "error",
-            name: 'error',
-            profilePic: 'error',
+            email: "",
+            name: '',
+            profilePic: '',
           ),
         ),
       );
@@ -80,8 +80,8 @@ class UserNotifier extends StateNotifier<LocalUser> {
   // Log out function
   void logOut() {
     state = LocalUser(
-      id: "error",
-      user: FirebaseUser(email: "error", name: 'error', profilePic: 'error'),
+      id: "",
+      user: FirebaseUser(email: "", name: '', profilePic: ''),
     );
   }
 }
