@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:tute_app/models/user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,62 +24,89 @@ class UserNotifier extends StateNotifier<LocalUser> {
     : super(
         LocalUser(
           id: "",
-          user: FirebaseUser(
-            email: "",
-            name: '',
-            profilePic: '',
-          ),
+          user: FirebaseUser(email: "", name: "", profilePic: ""),
         ),
       );
+
   // Firebase Firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final user = FirebaseAuth.instance.currentUser;
 
   // Log in Function
-  Future<void> login(String email) async {
-    QuerySnapshot response = await _firestore
-        .collection("users")
-        .where("email", isEqualTo: email)
-        .get();
+  Future<void> login(String s) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
 
-    if (response.docs.isEmpty) {
-      print("No Firestore user is associated to authenticated email: $email");
-      return;
-    }
+    if (currentUser == null) return;
 
-    if (response.docs.length != 1) {
-      print("More than one firestore user associate with email: $email");
-      return;
-    }
+    final doc = await _firestore.collection("users").doc(currentUser.uid).get();
+
+    if (!doc.exists) return;
 
     state = LocalUser(
-      id: response.docs[0].id,
-      user: FirebaseUser.fromMap(
-        response.docs[0].data() as Map<String, dynamic>,
+      id: doc.id,
+      user: FirebaseUser.fromMap(doc.data() as Map<String, dynamic>),
+    );
+  }
+
+  Future<void> loadUser() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) return;
+
+    final doc = await _firestore.collection("users").doc(currentUser.uid).get();
+
+    if (!doc.exists) return;
+
+    state = LocalUser(
+      id: doc.id,
+      user: FirebaseUser.fromMap(doc.data() as Map<String, dynamic>),
+    );
+  }
+
+  // ------CREATE DATA----------
+  // Sign Up function
+  Future<void> signUp(String email) async {
+    final currentUser = FirebaseAuth.instance.currentUser;
+
+    if (currentUser == null) {
+      throw Exception("User not authenticated");
+    }
+
+    await _firestore
+        .collection("users")
+        .doc(currentUser.uid)
+        .set(
+          FirebaseUser(
+            email: email,
+            name: currentUser.email!,
+            profilePic: 'http://www.gravatar.com/avatar/?d=mp',
+          ).toMap(),
+        );
+
+    state = LocalUser(
+      id: currentUser.uid,
+      user: FirebaseUser(
+        email: email,
+        name: currentUser.email!,
+        profilePic: 'http://www.gravatar.com/avatar/?d=mp',
       ),
     );
   }
 
-  // Sign Up function
-  Future<void> signUp(String email) async {
-    // Firebase Firestore
-    DocumentReference response = await _firestore
-        .collection("users")
-        .add(
-          FirebaseUser(
-            email: email,
-            name: 'No Name',
-            profilePic: 'http://www.gravatar.com/avatar/?d=mp',
-          ).toMap(),
-        );
-    DocumentSnapshot snapshot = await response.get();
-    state = LocalUser(
-      id: response.id,
-      user: FirebaseUser.fromMap(snapshot.data() as Map<String, dynamic>),
-    );
+  // ----UPDATE DATA-------
+  Future<void> updateName(String name) async {
+    if (state.id.isEmpty || state.id == "error") {
+      throw Exception("User not properly initialized or logged in");
+    }
+
+    await _firestore.collection("users").doc(state.id).update({"name": name});
+    state = state.copyWith(user: state.user.copyWith(name: name));
   }
 
   // Log out function
   void logOut() {
+    FirebaseAuth.instance.signOut(); // important
+
     state = LocalUser(
       id: "",
       user: FirebaseUser(email: "", name: '', profilePic: ''),
