@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tute_app/provider/user_provider.dart';
 
 class SettingsPage extends ConsumerStatefulWidget {
@@ -30,6 +33,38 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       ),
       body: Column(
         children: [
+          // PROFILE PICTURE
+          GestureDetector(
+            onTap: () async {
+              final ImagePicker picker = ImagePicker();
+              // Pick an image
+              final XFile? pickedImage = await picker.pickImage(
+                source: ImageSource.gallery,
+                requestFullMetadata: false,
+              );
+              if (pickedImage != null) {
+                ref
+                    .read(userProvider.notifier)
+                    .updateImage(File(pickedImage.path));
+              }
+            },
+            child: CircleAvatar(
+              radius: 100,
+              foregroundImage: NetworkImage(currentUser.user.profilePic),
+            ),
+          ),
+
+          SizedBox(height: 10),
+
+          // TAP TO CHANGE NAME
+          Center(
+            child: Text(
+              "Tap Image to change it",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+
+          // UPDATE NAME FORM FIELD
           TextFormField(
             style: TextStyle(color: Colors.white),
             decoration: InputDecoration(

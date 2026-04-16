@@ -1,8 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:tute_app/models/user.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final userProvider = StateNotifierProvider<UserNotifier, LocalUser>((ref) {
   return UserNotifier();
@@ -31,6 +33,7 @@ class UserNotifier extends StateNotifier<LocalUser> {
   // Firebase Firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final user = FirebaseAuth.instance.currentUser;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   // Log in Function
   Future<void> login(String s) async {
@@ -101,6 +104,24 @@ class UserNotifier extends StateNotifier<LocalUser> {
 
     await _firestore.collection("users").doc(state.id).update({"name": name});
     state = state.copyWith(user: state.user.copyWith(name: name));
+  }
+
+  // ----UPDATE PICTURE-------
+  Future<void> updateImage(File image) async {
+    if (state.id.isEmpty || state.id == "error") {
+      throw Exception("User not properly initialized or logged in");
+    }
+
+    Reference ref = _storage.ref().child("users").child(state.id);
+    TaskSnapshot snapshot = await ref.putFile(image);
+    String profilePicUrl = await snapshot.ref.getDownloadURL();
+
+    await _firestore.collection("users").doc(state.id).update({
+      "profilePic": profilePicUrl,
+    });
+    state = state.copyWith(
+      user: state.user.copyWith(profilePic: profilePicUrl),
+    );
   }
 
   // Log out function
