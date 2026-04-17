@@ -2,7 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tute_app/models/post.dart';
+import 'package:tute_app/pages/create_post_page.dart';
 import 'package:tute_app/pages/settings_page.dart';
+import 'package:tute_app/provider/post_provider.dart';
 import 'package:tute_app/provider/user_provider.dart';
 
 class HomePage extends ConsumerWidget {
@@ -13,7 +16,10 @@ class HomePage extends ConsumerWidget {
     LocalUser currentUser = ref.watch(userProvider);
 
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
         title: Text("H O M E"),
         centerTitle: true,
         leading: Builder(
@@ -32,9 +38,41 @@ class HomePage extends ConsumerWidget {
           },
         ),
       ),
-      body: Column(
-        children: [Text(currentUser.user.email), Text(currentUser.user.name)],
-      ),
+      body: ref
+          .watch(feedProvider)
+          .when(
+            data: (List<Post> posts) {
+              return ListView.builder(
+                itemCount: posts.length,
+                itemBuilder: (context, count) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border(bottom: BorderSide(color: Colors.grey)),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        foregroundImage: NetworkImage(posts[count].profilePic),
+                      ),
+                      title: Text(
+                        posts[count].name,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        posts[count].post,
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+            error: (error, StackTrace) => const Center(child: Text("error")),
+            loading: () => Center(child: const CircularProgressIndicator()),
+          ),
       drawer: Drawer(
         backgroundColor: Colors.black,
         child: Column(
@@ -269,6 +307,17 @@ class HomePage extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+
+      // FLOATING ACTION BUTTON TO CREATE TWEET
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreatePostPage()),
+          );
+        },
+        child: Icon(Icons.add),
       ),
     );
   }

@@ -64,6 +64,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
 
+          SizedBox(height: 10),
+
           // UPDATE NAME FORM FIELD
           TextFormField(
             style: TextStyle(color: Colors.white),
