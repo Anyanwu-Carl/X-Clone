@@ -18,9 +18,13 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(4.0),
+          child: Container(color: Colors.grey, height: 1),
+        ),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: Text("H O M E"),
+        title: FaIcon(FontAwesomeIcons.xTwitter, color: Colors.white, size: 30),
         centerTitle: true,
         leading: Builder(
           builder: (context) {
@@ -37,34 +41,44 @@ class HomePage extends ConsumerWidget {
             );
           },
         ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingsPage()),
+              );
+            },
+            icon: Icon(Icons.settings),
+          ),
+        ],
       ),
+
+      // App body
       body: ref
           .watch(feedProvider)
           .when(
             data: (List<Post> posts) {
-              return ListView.builder(
+              return ListView.separated(
+                separatorBuilder: (context, index) =>
+                    Divider(color: Colors.grey),
                 itemCount: posts.length,
                 itemBuilder: (context, count) {
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(color: Colors.grey)),
+                  return ListTile(
+                    leading: CircleAvatar(
+                      foregroundImage: NetworkImage(posts[count].profilePic),
                     ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        foregroundImage: NetworkImage(posts[count].profilePic),
+                    title: Text(
+                      posts[count].name,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      title: Text(
-                        posts[count].name,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text(
-                        posts[count].post,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
+                    ),
+                    subtitle: Text(
+                      posts[count].post,
+                      style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   );
                 },
@@ -73,6 +87,8 @@ class HomePage extends ConsumerWidget {
             error: (error, StackTrace) => const Center(child: Text("error")),
             loading: () => Center(child: const CircularProgressIndicator()),
           ),
+
+      // Drawer
       drawer: Drawer(
         backgroundColor: Colors.black,
         child: Column(
@@ -311,6 +327,9 @@ class HomePage extends ConsumerWidget {
 
       // FLOATING ACTION BUTTON TO CREATE TWEET
       floatingActionButton: FloatingActionButton(
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.blue,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
         onPressed: () {
           Navigator.push(
             context,

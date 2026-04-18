@@ -10,22 +10,40 @@ class CreatePostPage extends ConsumerWidget {
     TextEditingController postController = TextEditingController();
 
     return Scaffold(
-      appBar: AppBar(title: Text("Create Tweet"), centerTitle: true),
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        title: Text("Create a Post"),
+        centerTitle: true,
+      ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              cursorColor: Colors.white,
+              style: TextStyle(color: Colors.white),
               maxLines: 4,
-              decoration: InputDecoration(border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white, width: 2.0),
+                ),
+                counterStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               controller: postController,
               maxLength: 280,
             ),
           ),
 
           // POST BUTTON
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               // Read postProvider
               ref.read(postProvider).postPost(postController.text);
@@ -33,7 +51,14 @@ class CreatePostPage extends ConsumerWidget {
               // Go to previous screen
               Navigator.pop(context);
             },
-            child: Text("Post"),
+            style: ElevatedButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.blue,
+            ),
+            child: Text(
+              "Post",
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
           ),
         ],
       ),
