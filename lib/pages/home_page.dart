@@ -61,7 +61,7 @@ class _HomePageState extends ConsumerState<HomePage> {
             opacity: clicked ? 1 : 0,
             duration: const Duration(seconds: 1),
             child: Padding(
-              padding: const EdgeInsets.only(top: 25.0, right: 5),
+              padding: const EdgeInsets.only(right: 5),
               child: CircleAvatar(
                 radius: 60,
                 child: Image.asset("assets/images/mars.png"),
@@ -344,7 +344,7 @@ class _HomePageState extends ConsumerState<HomePage> {
 
       // FLOATING ACTION BUTTON TO CREATE TWEET
       floatingActionButton: AnimatedContainer(
-        padding: EdgeInsets.only(top: 90),
+        padding: EdgeInsets.only(top: 50),
         duration: Duration(seconds: 1),
         alignment: clicked ? Alignment.topRight : Alignment.bottomRight,
         child: SizedBox(
@@ -362,6 +362,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                     context,
                     MaterialPageRoute(builder: (context) => CreatePostPage()),
                   );
+                  setState(() {
+                    clicked = false;
+                  });
                 });
               });
             },
