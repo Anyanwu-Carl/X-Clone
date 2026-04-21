@@ -2,17 +2,32 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:rive/rive.dart';
 import 'package:tute_app/models/post.dart';
 import 'package:tute_app/pages/create_post_page.dart';
 import 'package:tute_app/pages/settings_page.dart';
 import 'package:tute_app/provider/post_provider.dart';
 import 'package:tute_app/provider/user_provider.dart';
 
-class HomePage extends ConsumerWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> {
+  bool clicked = false;
+  SMIInput<bool>? _pressed;
+
+  void _onRiveInit(Artboard artboard) {
+    final controller = StateMachineController.fromArtboard(artboard, "Button");
+    artboard.addController(controller!);
+    _pressed = controller.findInput("Press");
+  }
+
+  @override
+  Widget build(BuildContext context) {
     LocalUser currentUser = ref.watch(userProvider);
 
     return Scaffold(
@@ -42,14 +57,16 @@ class HomePage extends ConsumerWidget {
           },
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SettingsPage()),
-              );
-            },
-            icon: Icon(Icons.settings),
+          AnimatedOpacity(
+            opacity: clicked ? 1 : 0,
+            duration: const Duration(seconds: 1),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 25.0, right: 5),
+              child: CircleAvatar(
+                radius: 60,
+                child: Image.asset("assets/images/mars.png"),
+              ),
+            ),
           ),
         ],
       ),
@@ -326,17 +343,36 @@ class HomePage extends ConsumerWidget {
       ),
 
       // FLOATING ACTION BUTTON TO CREATE TWEET
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.blue,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => CreatePostPage()),
-          );
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: AnimatedContainer(
+        padding: EdgeInsets.only(top: 90),
+        duration: Duration(seconds: 1),
+        alignment: clicked ? Alignment.topRight : Alignment.bottomRight,
+        child: SizedBox(
+          width: 100,
+          height: 100,
+          child: GestureDetector(
+            onTapDown: (_) {
+              setState(() {
+                clicked = true;
+              });
+              _pressed?.value = true;
+              Future.delayed(Duration(seconds: 2), () {
+                setState(() {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreatePostPage()),
+                  );
+                });
+              });
+            },
+            onTapCancel: () => _pressed?.value = false,
+            onTapUp: (_) => _pressed?.value = false,
+            child: RiveAnimation.asset(
+              "assets/images/rocket.riv",
+              onInit: _onRiveInit,
+            ),
+          ),
+        ),
       ),
     );
   }
