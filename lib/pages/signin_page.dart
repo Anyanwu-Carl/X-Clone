@@ -132,6 +132,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextFormField(
+                    key: const ValueKey("loginEmail"),
                     style: TextStyle(color: Colors.white),
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
@@ -165,6 +166,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextFormField(
+                    key: const ValueKey("loginPassword"),
                     style: TextStyle(color: Colors.white),
                     controller: passwordController,
                     obscureText: true,
@@ -197,6 +199,7 @@ class _SignInPageState extends ConsumerState<SignInPage> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: TextButton(
+                    key: const ValueKey("loginButton"),
                     onPressed: () async {
                       if (_signInKey.currentState!.validate()) {
                         try {
